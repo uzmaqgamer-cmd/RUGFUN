@@ -1,0 +1,2487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RUG FUN — Meme Token Trading Game</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg-deep: #0a0b0e;
+    --bg-panel: #0f1117;
+    --bg-card: #161820;
+    --bg-hover: #1e2028;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.14);
+    --green: #00d97e;
+    --green-dim: rgba(0,217,126,0.15);
+    --red: #ff3b5c;
+    --red-dim: rgba(255,59,92,0.15);
+    --yellow: #f5c842;
+    --blue: #4f8ef7;
+    --purple: #a855f7;
+    --text: #e8eaf0;
+    --text-dim: #6b7280;
+    --text-muted: #3d4148;
+    --accent: #9945FF;
+    --accent2: #14F195;
+    --pump-green: #00d97e;
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'Space Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* ── Landing ── */
+  #screen-landing {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 0%, #1a0a2e 0%, #0d0a1a 45%, #080810 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #screen-landing::before {
+    content: '';
+    position: absolute;
+    top: -120px; left: 50%;
+    transform: translateX(-50%);
+    width: 900px; height: 900px;
+    background: radial-gradient(circle, rgba(153,69,255,0.22) 0%, rgba(153,69,255,0.06) 40%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #screen-landing::after {
+    content: '';
+    position: absolute;
+    bottom: -100px; left: 30%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(20,241,149,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .landing-branding {
+    position: absolute;
+    top: 18px; left: 22px;
+    font-size: 11px;
+    color: #e8b84b;
+    letter-spacing: 0.5px;
+    opacity: 0.75;
+    font-family: var(--mono);
+    z-index: 10;
+  }
+
+  #landing-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .logo-wrap {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.6s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo-main {
+    font-size: 6rem;
+    font-weight: 700;
+    letter-spacing: -3px;
+    background: linear-gradient(135deg, #9945FF 0%, #14F195 60%, #fff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    filter: drop-shadow(0 0 32px rgba(153,69,255,0.55)) drop-shadow(0 0 8px rgba(20,241,149,0.3));
+  }
+
+  .logo-sub {
+    font-size: 1rem;
+    color: var(--text-dim);
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    margin-top: 0.6rem;
+  }
+
+  .landing-cards {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    animation: fadeUp 0.6s ease 0.1s both;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mode-card {
+    background: rgba(22,24,32,0.85);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 18px;
+    padding: 2.2rem 2.5rem;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
+    text-align: center;
+    width: 240px;
+    position: relative;
+    backdrop-filter: blur(6px);
+  }
+
+  .mode-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 18px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(153,69,255,0), rgba(20,241,149,0));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    transition: background 0.25s;
+    pointer-events: none;
+  }
+
+  .mode-card:hover {
+    background: rgba(30,32,42,0.95);
+    transform: translateY(-7px);
+    box-shadow: 0 16px 48px rgba(153,69,255,0.18), 0 0 0 1px rgba(153,69,255,0.4);
+  }
+
+  .mode-card:hover::before {
+    background: linear-gradient(135deg, rgba(153,69,255,0.6), rgba(20,241,149,0.4));
+  }
+
+  .mode-card .icon { font-size: 3.5rem; margin-bottom: 1.1rem; }
+  .mode-card h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .mode-card p { font-size: 0.8rem; color: var(--text-dim); }
+
+  .landing-stats {
+    font-size: 0.82rem;
+    color: #4a5160;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 0.2px;
+  }
+
+  .landing-stats .stat-sep {
+    color: #e8b84b;
+    margin: 0 0.45rem;
+    opacity: 0.7;
+  }
+
+  .landing-footer {
+    position: absolute;
+    bottom: 14px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #2d3140;
+    letter-spacing: 0.3px;
+    z-index: 1;
+  }
+
+  /* ── Setup Screen ── */
+  #screen-setup {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--bg-deep);
+  }
+
+  .setup-box {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 520px;
+    animation: fadeUp 0.4s ease;
+  }
+
+  .setup-box h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .form-group { margin-bottom: 1.2rem; }
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input, .form-group select {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--accent);
+  }
+
+  .character-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+
+  .char-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 0.3rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    color: var(--text);
+  }
+
+  .char-btn:hover { border-color: var(--border-bright); background: var(--bg-hover); }
+  .char-btn.selected { border-color: var(--accent); background: rgba(153,69,255,0.15); }
+  .char-btn .char-avatar { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
+  .char-btn .char-name { font-size: 0.6rem; color: var(--text-dim); }
+
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, #9945FF, #14F195);
+    border: none;
+    border-radius: 10px;
+    padding: 0.9rem;
+    color: #000;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 1rem;
+  }
+
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .btn-secondary {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 1.2rem;
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-secondary:hover { background: var(--bg-hover); border-color: var(--border-bright); }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: var(--font);
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0;
+  }
+
+  .back-btn:hover { color: var(--text); }
+
+  /* ── Lobby ── */
+  #screen-lobby {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .lobby-box {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .room-code-display {
+    text-align: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .room-code-display .label { font-size: 0.75rem; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 0.5rem; }
+  .room-code-display .code {
+    font-family: var(--mono);
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 8px;
+    color: var(--accent2);
+  }
+
+  .player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .player-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    animation: slideIn 0.2s ease;
+  }
+
+  .player-item .avatar { font-size: 1.5rem; }
+  .player-item .pname { font-size: 0.95rem; font-weight: 500; }
+  .player-item .host-badge {
+    margin-left: auto;
+    font-size: 0.7rem;
+    background: rgba(153,69,255,0.2);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 2px 8px;
+  }
+
+  /* ── Countdown ── */
+  #screen-countdown {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-deep);
+  }
+
+  .countdown-wrap { text-align: center; }
+  .countdown-label {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    animation: pulse 1s infinite;
+  }
+
+  .countdown-number {
+    font-size: 10rem;
+    font-weight: 700;
+    font-family: var(--mono);
+    background: linear-gradient(135deg, #9945FF, #14F195);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: countPulse 1s ease;
+  }
+
+  .launch-text {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent2);
+    animation: launchAnim 0.5s ease;
+  }
+
+  /* ── Game Screen ── */
+  #screen-game {
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 1rem;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    height: 52px;
+  }
+
+  .topbar-logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #9945FF, #14F195);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
+  }
+
+  .sfx-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 0.22rem 0.55rem;
+    color: var(--text-dim);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .sfx-toggle:hover { border-color: var(--border-bright); color: var(--text); }
+  .sfx-toggle.muted { opacity: 0.35; }
+
+  .token-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+  }
+
+  .token-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .price-display {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--green);
+    transition: color 0.3s;
+  }
+
+  .price-display.down { color: var(--red); }
+
+  .mcap-display {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .timer-display {
+    font-family: var(--mono);
+    font-size: 1rem;
+    font-weight: 700;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.3rem 0.8rem;
+    color: var(--yellow);
+    white-space: nowrap;
+  }
+
+  .timer-display.urgent { color: var(--red); animation: pulse 0.5s infinite; }
+
+  .player-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.75rem;
+  }
+
+  .player-stat .balance {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+
+  .player-stat .pnl-indicator { font-size: 0.7rem; }
+  .player-stat .pnl-indicator.pos { color: var(--green); }
+  .player-stat .pnl-indicator.neg { color: var(--red); }
+
+  /* Main game layout */
+  .game-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr 240px;
+    grid-template-rows: 1fr 200px;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+  }
+
+  /* Left sidebar - players */
+  .sidebar-left {
+    grid-row: 1 / 3;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-section-title {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 0.75rem 1rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .players-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+  }
+
+  .player-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: 8px;
+    margin-bottom: 2px;
+    transition: background 0.15s;
+  }
+
+  .player-row:hover { background: var(--bg-hover); }
+  .player-row.self { background: rgba(153,69,255,0.08); border: 1px solid rgba(153,69,255,0.2); }
+  .player-row .rank { font-size: 0.7rem; color: var(--text-muted); width: 16px; text-align: center; }
+  .player-row .av { font-size: 1.1rem; }
+  .player-row .info { flex: 1; min-width: 0; }
+  .player-row .info .nm { font-size: 0.8rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .player-row .info .nw { font-family: var(--mono); font-size: 0.72rem; }
+  .player-row .info .nw.pos { color: var(--green); }
+  .player-row .info .nw.neg { color: var(--red); }
+
+  .bots-section { border-top: 1px solid var(--border); }
+  .bot-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    margin: 2px 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .bot-badge {
+    font-size: 0.6rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Center - chart */
+  .chart-area {
+    grid-column: 2;
+    grid-row: 1;
+    background: var(--bg-deep);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .chart-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .tf-btn {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    padding: 0.25rem 0.5rem;
+    color: var(--text-dim);
+    font-family: var(--font);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tf-btn:hover { color: var(--text); border-color: var(--border); }
+  .tf-btn.active { color: var(--accent2); border-color: rgba(20,241,149,0.3); background: rgba(20,241,149,0.06); }
+
+  .chart-canvas-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #chartCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Trade panel */
+  .trade-panel {
+    grid-column: 2;
+    grid-row: 2;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .trade-section {
+    flex: 1;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-right: 1px solid var(--border);
+  }
+
+  .trade-section:last-child { border-right: none; }
+
+  .trade-section h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 0.25rem;
+  }
+
+  .amount-btns {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .amt-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    color: var(--text-dim);
+    font-family: var(--font);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .amt-btn:hover { border-color: var(--border-bright); color: var(--text); }
+  .amt-btn.selected-buy { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+  .amt-btn.selected-sell { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+
+  .big-buy-btn {
+    background: var(--green);
+    border: none;
+    border-radius: 10px;
+    padding: 0.8rem;
+    color: #000;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    width: 100%;
+  }
+
+  .big-buy-btn:hover { background: #00f090; transform: translateY(-1px); }
+  .big-buy-btn:active { transform: scale(0.97); }
+  .big-buy-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .big-sell-btn {
+    background: var(--red);
+    border: none;
+    border-radius: 10px;
+    padding: 0.8rem;
+    color: #fff;
+    font-family: var(--font);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    width: 100%;
+  }
+
+  .big-sell-btn:hover { background: #ff5572; transform: translateY(-1px); }
+  .big-sell-btn:active { transform: scale(0.97); }
+  .big-sell-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .holdings-info {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+
+  .news-feed {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .news-item {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.78rem;
+    border-left: 3px solid var(--border);
+    animation: slideIn 0.3s ease;
+  }
+
+  .news-item.bullish { border-left-color: var(--green); }
+  .news-item.bearish { border-left-color: var(--red); }
+  .news-item.neutral { border-left-color: var(--yellow); }
+  .news-item.event-euphoria { border-left-color: var(--accent2); background: rgba(20,241,149,0.05); }
+  .news-item.event-catastrophe { border-left-color: var(--red); background: rgba(255,59,92,0.07); }
+
+  .news-item .news-text { line-height: 1.4; color: var(--text); }
+  .news-item .news-time { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.3rem; }
+
+  .live-feed-item {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    animation: slideIn 0.2s ease;
+  }
+
+  .live-feed-item .buy-tag { color: var(--green); font-weight: 600; }
+  .live-feed-item .sell-tag { color: var(--red); font-weight: 600; }
+
+  /* Event overlay */
+  .event-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .event-popup {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem 3rem;
+    text-align: center;
+    max-width: 500px;
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .event-popup.euphoria { border-color: var(--accent2); box-shadow: 0 0 60px rgba(20,241,149,0.2); }
+  .event-popup.catastrophe { border-color: var(--red); box-shadow: 0 0 60px rgba(255,59,92,0.2); }
+
+  .event-popup .event-icon { font-size: 4rem; margin-bottom: 1rem; }
+  .event-popup h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.75rem; }
+  .event-popup .event-text { font-size: 1rem; color: var(--text-dim); line-height: 1.5; }
+  .event-popup.euphoria h2 { color: var(--accent2); }
+  .event-popup.catastrophe h2 { color: var(--red); }
+
+  /* Leaderboard screen */
+  #screen-leaderboard {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 3rem 2rem;
+    background: var(--bg-deep);
+    overflow-y: auto;
+  }
+
+  .lb-header { text-align: center; margin-bottom: 3rem; }
+  .lb-header h1 { font-size: 2.5rem; font-weight: 700; }
+  .lb-header p { color: var(--text-dim); margin-top: 0.5rem; }
+
+  .podium {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .podium-place {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .podium-avatar { font-size: 2.5rem; }
+  .podium-name { font-size: 0.9rem; font-weight: 600; text-align: center; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .podium-amount { font-family: var(--mono); font-size: 0.85rem; }
+  .podium-amount.pos { color: var(--green); }
+  .podium-amount.neg { color: var(--red); }
+
+  .podium-stand {
+    border-radius: 8px 8px 0 0;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: rgba(0,0,0,0.6);
+  }
+
+  .stand-1 { background: #FFD700; height: 100px; }
+  .stand-2 { background: #C0C0C0; height: 70px; }
+  .stand-3 { background: #CD7F32; height: 50px; }
+
+  .lb-table {
+    width: 100%;
+    max-width: 700px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .lb-table table { width: 100%; border-collapse: collapse; }
+  .lb-table th {
+    background: var(--bg-card);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lb-table td {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lb-table tr:last-child td { border-bottom: none; }
+  .lb-table tr.self-row { background: rgba(153,69,255,0.08); }
+
+  .lb-table .rank-cell { font-weight: 700; color: var(--text-dim); width: 40px; }
+  .lb-table .medal-1 { color: #FFD700; }
+  .lb-table .medal-2 { color: #C0C0C0; }
+  .lb-table .medal-3 { color: #CD7F32; }
+
+  .lb-table .pnl-cell { font-family: var(--mono); font-weight: 600; }
+  .lb-table .pnl-cell.pos { color: var(--green); }
+  .lb-table .pnl-cell.neg { color: var(--red); }
+
+  .lb-footer { display: flex; gap: 1rem; justify-content: center; }
+
+  /* Scrollbars */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Animations */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  @keyframes countPulse { from { transform: scale(1.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes launchAnim { from { transform: scale(0.5) rotate(-10deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+  @keyframes priceFlash { 0%, 100% { } 50% { filter: brightness(1.5); } }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+
+  .flash-green { animation: priceFlash 0.4s ease; color: var(--green) !important; }
+  .flash-red { animation: priceFlash 0.4s ease; color: var(--red) !important; }
+
+  /* Rugpull screen */
+  .rugpull-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,0,0,0.15);
+    z-index: 999;
+    pointer-events: none;
+    animation: shake 0.5s ease;
+  }
+
+  /* Toast notifications */
+  .toast-container {
+    position: fixed;
+    top: 70px;
+    right: 1rem;
+    z-index: 998;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+    max-width: 300px;
+    pointer-events: auto;
+  }
+
+  .toast.buy { border-left: 3px solid var(--green); }
+  .toast.sell { border-left: 3px solid var(--red); }
+  .toast.event { border-left: 3px solid var(--yellow); }
+
+  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+  /* Join room input row */
+  .join-row { display: flex; gap: 0.5rem; }
+  .join-row input { flex: 1; }
+
+  /* Loading dots */
+  .dots::after {
+    content: '';
+    animation: dots 1.5s infinite;
+  }
+
+  @keyframes dots {
+    0% { content: ''; }
+    33% { content: '.'; }
+    66% { content: '..'; }
+    100% { content: '...'; }
+  }
+
+  select option { background: #1a1b22; }
+
+  /* ── Order Book ── */
+  .sidebar-right {
+    grid-row: 1 / 3;
+    background: var(--bg-panel);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .ob-panel {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ob-col-headers {
+    display: grid;
+    grid-template-columns: 42% 30% 28%;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.58rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ob-rows { overflow: hidden; }
+
+  .ob-row {
+    display: grid;
+    grid-template-columns: 42% 30% 28%;
+    padding: 0.12rem 0.5rem;
+    font-size: 0.67rem;
+    font-family: var(--mono);
+    position: relative;
+    line-height: 1.5;
+    cursor: default;
+  }
+
+  .ob-row:hover { background: rgba(255,255,255,0.03); }
+
+  .ob-depth-bar {
+    position: absolute;
+    top: 0; bottom: 0; right: 0;
+    pointer-events: none;
+    opacity: 0.1;
+    transition: width 0.4s ease;
+  }
+
+  .ob-row.ask { color: #f0534a; }
+  .ob-row.ask .ob-depth-bar { background: #f0534a; }
+  .ob-row.bid { color: #00c076; }
+  .ob-row.bid .ob-depth-bar { background: #00c076; }
+
+  .ob-mid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.28rem 0.5rem;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ob-mid .mid-price {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .ob-mid .mid-spread {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ SCREEN: LANDING ══════════════════════════════════════════════════════ -->
+<div id="screen-landing" class="screen active">
+  <canvas id="landing-particles"></canvas>
+  <div class="landing-branding">MADRIMOV TRADE &middot; Trading Education</div>
+  <div class="logo-wrap">
+    <div class="logo-main">RUG FUN</div>
+    <div class="logo-sub">Solana Meme Token Trading Game</div>
+  </div>
+  <div class="landing-cards">
+    <div class="mode-card" onclick="showSetup('single')">
+      <div class="icon">🤖</div>
+      <h3>Single Player</h3>
+      <p>Trade against bots.<br/>Sharpen your ape instincts.</p>
+    </div>
+    <div class="mode-card" onclick="showSetup('host')">
+      <div class="icon">🎮</div>
+      <h3>Host Game</h3>
+      <p>Create a room and invite<br/>your friends to compete.</p>
+    </div>
+    <div class="mode-card" onclick="showSetup('join')">
+      <div class="icon">🔗</div>
+      <h3>Join Game</h3>
+      <p>Enter a room code and<br/>start trading live.</p>
+    </div>
+  </div>
+  <div class="landing-stats">
+    25 Trending Meme Tokens
+    <span class="stat-sep">◆</span>
+    $10K Starting Market Cap
+    <span class="stat-sep">◆</span>
+    Real meme conditions
+    <span class="stat-sep">◆</span>
+    Educational only
+  </div>
+  <div class="landing-footer">
+    Built by Maqsadbek Madrimov &nbsp;&middot;&nbsp; Madrimov Trade &copy; 2026 &nbsp;&middot;&nbsp; Educational simulation only
+  </div>
+</div>
+
+<!-- ══ SCREEN: SETUP ════════════════════════════════════════════════════════ -->
+<div id="screen-setup" class="screen">
+  <div class="setup-box">
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    <h2 id="setup-title">Configure Game</h2>
+
+    <div class="form-group">
+      <label>Your Nickname</label>
+      <input type="text" id="playerName" placeholder="Enter your name..." maxlength="20" />
+    </div>
+
+    <div class="form-group">
+      <label>Choose Your Character</label>
+      <div class="character-grid" id="charGrid">
+        <div class="char-btn selected" data-char="satoshi" onclick="selectChar(this)">
+          <span class="char-avatar">🎭</span><span class="char-name">Satoshi</span>
+        </div>
+        <div class="char-btn" data-char="elon" onclick="selectChar(this)">
+          <span class="char-avatar">🐦</span><span class="char-name">Elon</span>
+        </div>
+        <div class="char-btn" data-char="trump" onclick="selectChar(this)">
+          <span class="char-avatar">🦅</span><span class="char-name">Trump</span>
+        </div>
+        <div class="char-btn" data-char="vitalik" onclick="selectChar(this)">
+          <span class="char-avatar">💻</span><span class="char-name">Vitalik</span>
+        </div>
+        <div class="char-btn" data-char="durov" onclick="selectChar(this)">
+          <span class="char-avatar">✈️</span><span class="char-name">Durov</span>
+        </div>
+        <div class="char-btn" data-char="zuck" onclick="selectChar(this)">
+          <span class="char-avatar">🤖</span><span class="char-name">Zuckerberg</span>
+        </div>
+        <div class="char-btn" data-char="biden" onclick="selectChar(this)">
+          <span class="char-avatar">🍦</span><span class="char-name">Biden</span>
+        </div>
+        <div class="char-btn" data-char="tate" onclick="selectChar(this)">
+          <span class="char-avatar">🥊</span><span class="char-name">Tate</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="host-options" class="form-group" style="display:none;">
+      <label>Max Players</label>
+      <input type="number" id="maxPlayers" value="10" min="2" max="50" />
+    </div>
+
+    <div id="duration-option" class="form-group">
+      <label>Game Duration</label>
+      <select id="gameDuration">
+        <option value="5">5 minutes</option>
+        <option value="10" selected>10 minutes</option>
+        <option value="15">15 minutes</option>
+        <option value="20">20 minutes</option>
+      </select>
+    </div>
+
+    <div id="bot-option" class="form-group">
+      <label>Bot Players</label>
+      <select id="botCount">
+        <option value="3">3 bots (Quiet)</option>
+        <option value="5" selected>5 bots (Active)</option>
+        <option value="8">8 bots (Chaotic)</option>
+        <option value="10">10 bots (Wild)</option>
+      </select>
+    </div>
+
+    <div id="join-options" class="form-group" style="display:none;">
+      <label>Room Code</label>
+      <div class="join-row">
+        <input type="text" id="roomCodeInput" placeholder="Enter 6-letter code..." maxlength="6" style="text-transform:uppercase;" />
+      </div>
+    </div>
+
+    <button class="btn-primary" id="setupBtn" onclick="handleSetup()">🚀 Let's Go!</button>
+    <div id="setup-error" style="color:var(--red);font-size:0.8rem;text-align:center;margin-top:0.5rem;"></div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: LOBBY ════════════════════════════════════════════════════════ -->
+<div id="screen-lobby" class="screen">
+  <div class="lobby-box">
+    <button class="back-btn" onclick="goBack()">← Leave</button>
+    <h2 style="text-align:center;margin-bottom:1.5rem;">Waiting for Players</h2>
+    <div class="room-code-display" id="room-code-wrap">
+      <div class="label">ROOM CODE — SHARE WITH FRIENDS</div>
+      <div class="code" id="lobby-room-code">------</div>
+    </div>
+    <div class="player-list" id="lobby-player-list"></div>
+    <div style="font-size:0.8rem;color:var(--text-dim);text-align:center;margin-bottom:1rem;" id="lobby-status">
+      <span class="dots">Waiting for host to start</span>
+    </div>
+    <button class="btn-primary" id="start-game-btn" onclick="startGame()" style="display:none;">🚀 Start Game!</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN: COUNTDOWN ════════════════════════════════════════════════════ -->
+<div id="screen-countdown" class="screen">
+  <div class="countdown-wrap">
+    <div class="countdown-label">Launch is coming</div>
+    <div id="countdown-number" class="countdown-number">5</div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: GAME ══════════════════════════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-logo">RUG FUN</div>
+    <div class="token-info">
+      <span id="token-emoji-display" style="font-size:1.2rem;line-height:1;">🪙</span>
+      <span class="token-name" id="token-name-display">$TOKEN</span>
+      <span class="price-display" id="top-price">$0.0001</span>
+      <span class="mcap-display">MC: <span id="top-mcap">$10,000</span></span>
+      <span style="font-size:0.75rem;color:var(--text-muted);margin-left:0.5rem;" id="top-change"></span>
+    </div>
+    <div class="timer-display" id="game-timer">10:00</div>
+    <div class="player-stat">
+      <span class="balance" id="top-balance">$100.00</span>
+      <span class="pnl-indicator" id="top-pnl">$0.00</span>
+    </div>
+    <button class="sfx-toggle" id="sfx-btn" onclick="toggleSFX()" title="Toggle sound effects">🔊</button>
+  </div>
+
+  <!-- Main layout -->
+  <div class="game-layout">
+    <!-- Left: Players -->
+    <div class="sidebar-left">
+      <div class="sidebar-section-title">Players</div>
+      <div class="players-scroll" id="player-list-game"></div>
+      <div class="bots-section">
+        <div class="sidebar-section-title">Bots</div>
+        <div id="bot-list-game" style="padding:0.4rem 0;"></div>
+      </div>
+    </div>
+
+    <!-- Center: Chart -->
+    <div class="chart-area">
+      <div class="chart-toolbar">
+        <span style="font-size:0.78rem;color:var(--text-dim);margin-right:0.25rem;">TF:</span>
+        <button class="tf-btn active" onclick="setTF('all',this)">ALL</button>
+        <button class="tf-btn" onclick="setTF('5m',this)">5M</button>
+        <button class="tf-btn" onclick="setTF('3m',this)">3M</button>
+        <button class="tf-btn" onclick="setTF('1m',this)">1M</button>
+        <button class="tf-btn" onclick="setTF('1s',this)">1S</button>
+        <span style="flex:1;"></span>
+        <span style="font-size:0.75rem;color:var(--text-dim);">O:<span id="cd-open" style="color:var(--text);">—</span></span>
+        <span style="font-size:0.75rem;color:var(--text-dim);margin-left:0.75rem;">H:<span id="cd-high" style="color:var(--green);">—</span></span>
+        <span style="font-size:0.75rem;color:var(--text-dim);margin-left:0.75rem;">L:<span id="cd-low" style="color:var(--red);">—</span></span>
+        <span style="font-size:0.75rem;color:var(--text-dim);margin-left:0.75rem;">C:<span id="cd-close" style="color:var(--text);">—</span></span>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="chartCanvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Right: Order Book + Live Feed -->
+    <div class="sidebar-right">
+      <div class="sidebar-section-title">📊 Order Book</div>
+      <div class="ob-panel" id="ob-panel">
+        <div class="ob-col-headers">
+          <span>Price (USD)</span><span>Amount</span><span>Total</span>
+        </div>
+        <div class="ob-rows" id="ob-asks"></div>
+        <div class="ob-mid">
+          <span class="mid-price" id="ob-mid-price">—</span>
+          <span class="mid-spread" id="ob-spread-info">Spread —</span>
+        </div>
+        <div class="ob-rows" id="ob-bids"></div>
+      </div>
+      <div class="sidebar-section-title" style="border-top:1px solid var(--border);">📰 Live Feed</div>
+      <div class="news-feed" id="news-feed"></div>
+    </div>
+
+    <!-- Bottom: Trade panel -->
+    <div class="trade-panel">
+      <!-- Buy section -->
+      <div class="trade-section">
+        <h4>Buy <span id="trade-token-label">$TOKEN</span></h4>
+        <div class="amount-btns" id="buy-amounts">
+          <button class="amt-btn selected-buy" data-amt="5" onclick="selectBuyAmt(this)">$5</button>
+          <button class="amt-btn" data-amt="10" onclick="selectBuyAmt(this)">$10</button>
+          <button class="amt-btn" data-amt="25" onclick="selectBuyAmt(this)">$25</button>
+          <button class="amt-btn" data-amt="50" onclick="selectBuyAmt(this)">$50</button>
+          <button class="amt-btn" data-amt="all" onclick="selectBuyAmt(this)">MAX</button>
+        </div>
+        <div class="holdings-info">Balance: $<span id="trade-balance">100.00</span></div>
+        <button class="big-buy-btn" onclick="executeBuy()">BUY ▲</button>
+      </div>
+
+      <!-- Sell section -->
+      <div class="trade-section">
+        <h4>Sell <span id="trade-token-label-sell">$TOKEN</span></h4>
+        <div class="amount-btns" id="sell-amounts">
+          <button class="amt-btn" data-pct="0.25" onclick="selectSellPct(this)">25%</button>
+          <button class="amt-btn selected-sell" data-pct="0.5" onclick="selectSellPct(this)">50%</button>
+          <button class="amt-btn" data-pct="0.75" onclick="selectSellPct(this)">75%</button>
+          <button class="amt-btn" data-pct="1.0" onclick="selectSellPct(this)">100%</button>
+        </div>
+        <div class="holdings-info">Holdings: <span id="trade-holdings">0.00</span> tokens</div>
+        <button class="big-sell-btn" onclick="executeSell()">SELL ▼</button>
+      </div>
+
+      <!-- Stats section -->
+      <div class="trade-section" style="min-width:180px;max-width:200px;">
+        <h4>Your Position</h4>
+        <div style="display:flex;flex-direction:column;gap:0.4rem;font-size:0.8rem;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="color:var(--text-dim);">Avg buy</span>
+            <span class="font-mono" id="stat-avg-buy" style="font-family:var(--mono);">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="color:var(--text-dim);">Value</span>
+            <span style="font-family:var(--mono);" id="stat-hold-value">$0.00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="color:var(--text-dim);">Net Worth</span>
+            <span style="font-family:var(--mono);font-weight:600;" id="stat-net-worth">$100.00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="color:var(--text-dim);">P&amp;L</span>
+            <span style="font-family:var(--mono);font-weight:700;" id="stat-pnl">$0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN: LEADERBOARD ══════════════════════════════════════════════════ -->
+<div id="screen-leaderboard" class="screen">
+  <div class="lb-header">
+    <h1 id="lb-title">🏆 Final Results</h1>
+    <p id="lb-subtitle">Game Over — Here's how everyone did</p>
+  </div>
+  <div class="podium" id="lb-podium"></div>
+  <div class="lb-table">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>Net Worth</th>
+          <th>P&amp;L</th>
+          <th>Return</th>
+        </tr>
+      </thead>
+      <tbody id="lb-tbody"></tbody>
+    </table>
+  </div>
+  <div class="lb-footer">
+    <button class="btn-secondary" onclick="goHome()">🏠 Main Menu</button>
+    <button class="btn-primary" style="width:auto;padding:0.7rem 2rem;" onclick="playAgain()">🔄 Play Again</button>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// RUG FUN — Game Client
+// ══════════════════════════════════════════════════════════════════════════════
+
+const CHARS = {
+  satoshi: '🎭', elon: '🐦', trump: '🦅', vitalik: '💻',
+  durov: '✈️', zuck: '🤖', biden: '🍦', tate: '🥊'
+};
+
+let ws = null;
+let playerId = null;
+let roomCode = null;
+let gameMode = 'single';
+let selectedChar = 'satoshi';
+let selectedBuyAmt = 5;
+let selectedSellPct = 0.5;
+let gameState = null;
+let timerInterval = null;
+let gameEndTime = null;
+let currentTimeframe = 'all';
+let lastPrice = null;
+let avgBuyPrice = 0;
+let totalBought = 0;
+let totalBoughtTokens = 0;
+let currentToken = { name: 'TOKEN', emoji: '🪙', fullName: 'Token' };
+let obUpdateTimer = null;
+
+// ── Navigation ─────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+
+function showSetup(mode) {
+  gameMode = mode;
+  document.getElementById('setup-title').textContent =
+    mode === 'single' ? '⚡ Single Player' :
+    mode === 'host' ? '🎮 Host Game' : '🔗 Join Game';
+
+  document.getElementById('host-options').style.display = mode === 'host' ? '' : 'none';
+  document.getElementById('join-options').style.display = mode === 'join' ? '' : 'none';
+  document.getElementById('bot-option').style.display = mode === 'join' ? 'none' : '';
+  document.getElementById('duration-option').style.display = mode === 'join' ? 'none' : '';
+  document.getElementById('setup-error').textContent = '';
+  showScreen('setup');
+}
+
+function goBack() {
+  if (ws) { ws.close(); ws = null; }
+  clearTimers();
+  showScreen('landing');
+}
+
+function goHome() {
+  if (ws) { ws.close(); ws = null; }
+  clearTimers();
+  showScreen('landing');
+}
+
+function clearTimers() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function selectChar(el) {
+  document.querySelectorAll('.char-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedChar = el.dataset.char;
+}
+
+// ── WebSocket Connection ────────────────────────────────────────────────────
+function connectWS(callback) {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const wsUrl = `${proto}//${location.host}`;
+  ws = new WebSocket(wsUrl);
+
+  ws.onopen = () => { if (callback) callback(); };
+  ws.onmessage = (e) => handleMessage(JSON.parse(e.data));
+  ws.onerror = () => showError('Connection failed. Is the server running?');
+  ws.onclose = () => {
+    if (document.getElementById('screen-game').classList.contains('active')) {
+      showToast('⚠️ Disconnected from server', 'event');
+    }
+  };
+
+  // Keep-alive ping
+  setInterval(() => {
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' }));
+  }, 25000);
+}
+
+function handleSetup() {
+  const name = document.getElementById('playerName').value.trim() || 'Degen';
+  document.getElementById('setup-error').textContent = '';
+
+  connectWS(() => {
+    if (gameMode === 'single') {
+      ws.send(JSON.stringify({
+        type: 'start_singleplayer',
+        playerName: name,
+        character: selectedChar,
+        gameDuration: parseInt(document.getElementById('gameDuration').value),
+        botCount: parseInt(document.getElementById('botCount').value),
+      }));
+    } else if (gameMode === 'host') {
+      ws.send(JSON.stringify({
+        type: 'create_room',
+        playerName: name,
+        character: selectedChar,
+        maxPlayers: parseInt(document.getElementById('maxPlayers').value),
+        gameDuration: parseInt(document.getElementById('gameDuration').value),
+        botCount: parseInt(document.getElementById('botCount').value),
+      }));
+    } else {
+      const code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+      if (!code || code.length < 4) { showError('Enter a valid room code'); return; }
+      ws.send(JSON.stringify({
+        type: 'join_room',
+        roomCode: code,
+        playerName: name,
+        character: selectedChar,
+      }));
+    }
+  });
+}
+
+function showError(msg) {
+  document.getElementById('setup-error').textContent = msg;
+}
+
+function startGame() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'start_game' }));
+  }
+}
+
+// ── Message Handler ─────────────────────────────────────────────────────────
+function handleMessage(msg) {
+  switch (msg.type) {
+    case 'connected':
+      playerId = msg.playerId;
+      break;
+
+    case 'room_created':
+      roomCode = msg.roomCode;
+      if (msg.isSingleplayer) {
+        // Will get countdown right away
+      } else {
+        showLobby(msg.state, true);
+      }
+      break;
+
+    case 'room_joined':
+      roomCode = msg.roomCode;
+      showLobby(msg.state, false);
+      break;
+
+    case 'player_joined':
+    case 'player_left':
+      updateLobby(msg.state);
+      break;
+
+    case 'countdown':
+      showCountdown(msg.count, msg.message);
+      break;
+
+    case 'game_started':
+      initGame(msg.state);
+      break;
+
+    case 'price_update':
+      updatePrice(msg.price, msg.marketCap, msg.currentCandle);
+      break;
+
+    case 'trade':
+      handleTrade(msg);
+      break;
+
+    case 'trade_confirmed':
+      handleTradeConfirmed(msg);
+      break;
+
+    case 'bot_action':
+      handleBotAction(msg);
+      break;
+
+    case 'news':
+      addNewsItem(msg.news, msg.price, msg.marketCap, msg.currentCandle);
+      break;
+
+    case 'candle_closed':
+      gameState.candles = msg.candles;
+      gameState.currentCandle = msg.currentCandle;
+      renderChart();
+      break;
+
+    case 'random_event':
+      handleRandomEvent(msg);
+      break;
+
+    case 'game_ended':
+      showLeaderboard(msg);
+      break;
+
+    case 'room_state':
+      gameState = msg;
+      updateGameUI();
+      break;
+
+    case 'error':
+      showError(msg.message);
+      showToast('❌ ' + msg.message, 'event');
+      break;
+  }
+}
+
+// ── Lobby ────────────────────────────────────────────────────────────────────
+function showLobby(state, isHost) {
+  showScreen('lobby');
+  document.getElementById('lobby-room-code').textContent = state.roomId;
+  const startBtn = document.getElementById('start-game-btn');
+  startBtn.style.display = isHost ? '' : 'none';
+  updateLobby(state);
+}
+
+function updateLobby(state) {
+  const list = document.getElementById('lobby-player-list');
+  list.innerHTML = '';
+  state.players.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'player-item';
+    div.innerHTML = `<span class="avatar">${CHARS[p.character] || '🎭'}</span>
+      <span class="pname">${p.name}</span>
+      ${p.isHost ? '<span class="host-badge">HOST</span>' : ''}`;
+    list.appendChild(div);
+  });
+  document.getElementById('lobby-status').textContent =
+    `${state.players.length} player(s) ready`;
+}
+
+// ── Countdown ────────────────────────────────────────────────────────────────
+function showCountdown(count, message) {
+  showScreen('countdown');
+  const el = document.getElementById('countdown-number');
+  if (count <= 0) {
+    el.className = 'launch-text';
+    el.textContent = '🚀 LAUNCH!';
+  } else {
+    el.className = 'countdown-number';
+    el.textContent = count;
+  }
+  document.querySelector('.countdown-label').textContent = message;
+}
+
+// ── Game Init ─────────────────────────────────────────────────────────────────
+function initGame(state) {
+  gameState = state;
+  lastPrice = state.price;
+  avgBuyPrice = 0;
+  totalBought = 0;
+  totalBoughtTokens = 0;
+
+  if (state.tokenName) {
+    currentToken = { name: state.tokenName, emoji: state.tokenEmoji, fullName: state.tokenFullName };
+    applyTokenToUI();
+  }
+
+  const me = state.players.find(p => p.id === playerId);
+  if (!me) return;
+
+  showScreen('game');
+  resizeChart();
+  updateGameUI();
+  startGameTimer(state.endTime);
+  renderChart();
+  generateOrderBook(state.price);
+  renderOrderBook();
+}
+
+function applyTokenToUI() {
+  const sym = '$' + currentToken.name;
+  const el = document.getElementById('token-name-display');
+  if (el) el.textContent = sym;
+  const emojiEl = document.getElementById('token-emoji-display');
+  if (emojiEl) emojiEl.textContent = currentToken.emoji;
+  const buyLbl = document.getElementById('trade-token-label');
+  if (buyLbl) buyLbl.textContent = sym;
+  const sellLbl = document.getElementById('trade-token-label-sell');
+  if (sellLbl) sellLbl.textContent = sym;
+}
+
+function updateGameUI() {
+  if (!gameState) return;
+  const me = gameState.players ? gameState.players.find(p => p.id === playerId) : null;
+  if (!me) return;
+
+  const price = gameState.price;
+  const balance = me.balance;
+  const holdings = me.holdings;
+  const holdValue = holdings * price;
+  const netWorth = balance + holdValue;
+  const pnl = netWorth - 100;
+
+  // Topbar
+  const priceEl = document.getElementById('top-price');
+  const newPriceText = formatPrice(price);
+
+  if (lastPrice !== null && price !== lastPrice) {
+    priceEl.className = 'price-display ' + (price > lastPrice ? '' : 'down');
+    priceEl.classList.add(price > lastPrice ? 'flash-green' : 'flash-red');
+    setTimeout(() => priceEl.classList.remove('flash-green', 'flash-red'), 400);
+  }
+
+  priceEl.textContent = newPriceText;
+  document.getElementById('top-mcap').textContent = formatMC(gameState.marketCap);
+  document.getElementById('top-balance').textContent = '$' + balance.toFixed(2);
+  const pnlEl = document.getElementById('top-pnl');
+  pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2);
+  pnlEl.className = 'pnl-indicator ' + (pnl >= 0 ? 'pos' : 'neg');
+
+  // Trade panel
+  document.getElementById('trade-balance').textContent = balance.toFixed(2);
+  document.getElementById('trade-holdings').textContent = formatTokens(holdings);
+  document.getElementById('stat-hold-value').textContent = '$' + holdValue.toFixed(2);
+  document.getElementById('stat-net-worth').textContent = '$' + netWorth.toFixed(2);
+  const pnlStatEl = document.getElementById('stat-pnl');
+  pnlStatEl.textContent = (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2);
+  pnlStatEl.style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+
+  if (avgBuyPrice > 0) {
+    document.getElementById('stat-avg-buy').textContent = formatPrice(avgBuyPrice);
+  }
+
+  // Player list
+  renderPlayerList();
+
+  // Bot list
+  renderBotList();
+
+  lastPrice = price;
+}
+
+function renderPlayerList() {
+  if (!gameState || !gameState.players) return;
+  const sorted = [...gameState.players].sort((a, b) => b.netWorth - a.netWorth);
+  const list = document.getElementById('player-list-game');
+  list.innerHTML = '';
+  sorted.forEach((p, i) => {
+    const isMe = p.id === playerId;
+    const pnl = p.netWorth - 100;
+    const div = document.createElement('div');
+    div.className = 'player-row ' + (isMe ? 'self' : '');
+    div.innerHTML = `<span class="rank">${i + 1}</span>
+      <span class="av">${CHARS[p.character] || '🎭'}</span>
+      <div class="info">
+        <div class="nm">${p.name}${isMe ? ' (You)' : ''}</div>
+        <div class="nw ${pnl >= 0 ? 'pos' : 'neg'}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function renderBotList() {
+  if (!gameState || !gameState.bots) return;
+  const list = document.getElementById('bot-list-game');
+  list.innerHTML = '';
+  gameState.bots.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'bot-row';
+    div.innerHTML = `<span>${b.emoji}</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.name}</span>
+      <span class="bot-badge">${b.type}</span>`;
+    list.appendChild(div);
+  });
+}
+
+// ── Timer ─────────────────────────────────────────────────────────────────────
+function startGameTimer(endTime) {
+  gameEndTime = endTime;
+  clearTimers();
+  timerInterval = setInterval(() => {
+    const remaining = Math.max(0, gameEndTime - Date.now());
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    const timerEl = document.getElementById('game-timer');
+    timerEl.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    timerEl.className = 'timer-display' + (remaining < 60000 ? ' urgent' : '');
+    if (remaining <= 0) clearTimers();
+  }, 500);
+}
+
+// ── Chart ─────────────────────────────────────────────────────────────────────
+let chartCanvas, chartCtx;
+let chartData = [];
+
+function initChart() {
+  chartCanvas = document.getElementById('chartCanvas');
+  chartCtx = chartCanvas.getContext('2d');
+  resizeChart();
+  window.addEventListener('resize', resizeChart);
+}
+
+function resizeChart() {
+  if (!chartCanvas) return;
+  const wrap = chartCanvas.parentElement;
+  chartCanvas.width = wrap.clientWidth;
+  chartCanvas.height = wrap.clientHeight;
+  renderChart();
+}
+
+function setTF(tf, btn) {
+  currentTimeframe = tf;
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChart();
+}
+
+function getVisibleCandles() {
+  if (!gameState) return [];
+  const all = [...(gameState.candles || [])];
+  if (gameState.currentCandle) all.push(gameState.currentCandle);
+  if (!all.length) return [];
+
+  const now = Date.now();
+  if (currentTimeframe === 'all') return all;
+
+  const msMap = { '1s': 10000, '1m': 60000, '3m': 180000, '5m': 300000 };
+  const cutoff = now - msMap[currentTimeframe];
+  return all.filter(c => c.time >= cutoff);
+}
+
+function renderChart() {
+  if (!chartCtx || !chartCanvas) return;
+  const w = chartCanvas.width, h = chartCanvas.height;
+  const ctx = chartCtx;
+
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#0a0b0e';
+  ctx.fillRect(0, 0, w, h);
+
+  const candles = getVisibleCandles();
+
+  if (gameState && gameState.currentCandle) {
+    const c = gameState.currentCandle;
+    document.getElementById('cd-open').textContent = formatPrice(c.open);
+    document.getElementById('cd-high').textContent = formatPrice(c.high);
+    document.getElementById('cd-low').textContent = formatPrice(c.low);
+    document.getElementById('cd-close').textContent = formatPrice(c.close);
+  }
+
+  const PAD = { top: 28, right: 78, bottom: 36, left: 10 };
+  const chartW = w - PAD.left - PAD.right;
+  const chartH = h - PAD.top - PAD.bottom;
+
+  // TradingView-style: always keep at least 120 slots so candles stay thin
+  const MIN_SLOTS = 120;
+  const totalSlots = Math.max(MIN_SLOTS, candles.length + 20);
+  const slotW = chartW / totalSlots;
+  // Body width: 60% of slot, hard max 7px — matches pump.fun thin look
+  const bodyW = Math.max(1, Math.min(7, slotW * 0.6));
+  // Candles are right-aligned (latest on right edge)
+  const startOffset = totalSlots - candles.length;
+
+  if (!candles.length) {
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.font = '13px Space Grotesk, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Waiting for price data...', w / 2, h / 2);
+    return;
+  }
+
+  let minP = Infinity, maxP = -Infinity;
+  candles.forEach(c => {
+    minP = Math.min(minP, c.low);
+    maxP = Math.max(maxP, c.high);
+  });
+  const range = maxP - minP || minP * 0.05;
+  minP -= range * 0.1;
+  maxP += range * 0.1;
+
+  const priceToY = (p) => PAD.top + chartH * (1 - (p - minP) / (maxP - minP));
+
+  // Horizontal grid lines + price labels
+  const gridLines = 5;
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= gridLines; i++) {
+    const y = PAD.top + (chartH / gridLines) * i;
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.beginPath();
+    ctx.moveTo(PAD.left, y);
+    ctx.lineTo(w - PAD.right, y);
+    ctx.stroke();
+    const p = maxP - (maxP - minP) * (i / gridLines);
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.font = '10px Space Mono, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(formatPrice(p), w - PAD.right + 5, y + 3);
+  }
+
+  // Volume bars (behind candles)
+  const maxVol = Math.max(...candles.map(c => c.volume || 0), 1);
+  const volMaxH = chartH * 0.1;
+  candles.forEach((c, i) => {
+    const slotIdx = startOffset + i;
+    const x = PAD.left + slotIdx * slotW + slotW / 2;
+    const vH = Math.max(1, ((c.volume || 0) / maxVol) * volMaxH);
+    const isGreen = c.close >= c.open;
+    ctx.fillStyle = isGreen ? 'rgba(0,217,126,0.18)' : 'rgba(255,59,92,0.18)';
+    ctx.fillRect(x - bodyW / 2, h - PAD.bottom - vH, bodyW, vH);
+  });
+
+  // Draw candles — right-aligned, thin TradingView/pump.fun style
+  candles.forEach((c, i) => {
+    const slotIdx = startOffset + i;
+    const x = PAD.left + slotIdx * slotW + slotW / 2;
+    const isGreen = c.close >= c.open;
+    const bullColor = '#26a69a';   // teal-green like TradingView
+    const bearColor = '#ef5350';   // red like TradingView
+    const color = isGreen ? bullColor : bearColor;
+
+    const bodyTop = priceToY(Math.max(c.open, c.close));
+    const bodyBot = priceToY(Math.min(c.open, c.close));
+    const bodyH = Math.max(1, bodyBot - bodyTop);
+    const halfBW = bodyW / 2;
+
+    // Upper wick
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, priceToY(c.high));
+    ctx.lineTo(x, bodyTop);
+    ctx.stroke();
+
+    // Lower wick
+    ctx.beginPath();
+    ctx.moveTo(x, bodyBot);
+    ctx.lineTo(x, priceToY(c.low));
+    ctx.stroke();
+
+    // Candle body — filled
+    ctx.fillStyle = color;
+    ctx.fillRect(x - halfBW, bodyTop, bodyW, bodyH);
+  });
+
+  // Current price dashed line + label
+  if (gameState && gameState.price) {
+    const py = priceToY(gameState.price);
+    const isUp = !lastPrice || gameState.price >= lastPrice;
+    const lineColor = isUp ? 'rgba(38,166,154,0.7)' : 'rgba(239,83,80,0.7)';
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(PAD.left, py);
+    ctx.lineTo(w - PAD.right, py);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const tagColor = isUp ? '#26a69a' : '#ef5350';
+    ctx.fillStyle = tagColor;
+    ctx.fillRect(w - PAD.right + 1, py - 9, PAD.right - 2, 18);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 9px Space Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(formatPrice(gameState.price), w - PAD.right / 2, py + 3);
+  }
+}
+
+// ── Order Book ────────────────────────────────────────────────────────────────
+let obAsks = [];
+let obBids = [];
+
+function generateOrderBook(price) {
+  if (!price || price <= 0) return;
+  const spread = price * 0.004;
+  const LEVELS = 7;
+  const step = price * 0.0018;
+
+  obAsks = [];
+  let askCum = 0;
+  for (let i = 0; i < LEVELS; i++) {
+    const p = price + spread / 2 + step * i + (Math.random() - 0.5) * step * 0.3;
+    const tokens = 80000 + Math.random() * 600000;
+    const usd = tokens * p;
+    askCum += usd;
+    obAsks.push({ price: p, tokens, usd, cum: askCum });
+  }
+
+  obBids = [];
+  let bidCum = 0;
+  for (let i = 0; i < LEVELS; i++) {
+    const p = price - spread / 2 - step * i - (Math.random() - 0.5) * step * 0.3;
+    const tokens = 80000 + Math.random() * 600000;
+    const usd = tokens * p;
+    bidCum += usd;
+    obBids.push({ price: p, tokens, usd, cum: bidCum });
+  }
+
+  // Slightly jitter existing levels for realism on updates
+  const maxCum = Math.max(askCum, bidCum);
+  obAsks.forEach(r => r.depth = r.cum / maxCum);
+  obBids.forEach(r => r.depth = r.cum / maxCum);
+}
+
+function nudgeOrderBook(price) {
+  if (!price || !obAsks.length) { generateOrderBook(price); return; }
+  const spread = price * 0.004;
+  const step = price * 0.0018;
+  obAsks = obAsks.map((r, i) => {
+    const p = price + spread / 2 + step * i + (Math.random() - 0.5) * step * 0.2;
+    const tokens = Math.max(10000, r.tokens * (0.85 + Math.random() * 0.3));
+    return { ...r, price: p, tokens, usd: tokens * p };
+  });
+  obBids = obBids.map((r, i) => {
+    const p = price - spread / 2 - step * i - (Math.random() - 0.5) * step * 0.2;
+    const tokens = Math.max(10000, r.tokens * (0.85 + Math.random() * 0.3));
+    return { ...r, price: p, tokens, usd: tokens * p };
+  });
+  let ac = 0, bc = 0;
+  obAsks.forEach(r => { ac += r.usd; r.cum = ac; });
+  obBids.forEach(r => { bc += r.usd; r.cum = bc; });
+  const maxC = Math.max(ac, bc);
+  obAsks.forEach(r => r.depth = r.cum / maxC);
+  obBids.forEach(r => r.depth = r.cum / maxC);
+}
+
+function renderOrderBook() {
+  const asksEl = document.getElementById('ob-asks');
+  const bidsEl = document.getElementById('ob-bids');
+  const midEl  = document.getElementById('ob-mid-price');
+  const sprEl  = document.getElementById('ob-spread-info');
+  if (!asksEl || !obAsks.length) return;
+
+  const price = gameState ? gameState.price : 0;
+  const isUp = !lastPrice || price >= lastPrice;
+
+  // Asks: show in reverse order (highest first, lowest closest to mid)
+  const sortedAsks = [...obAsks].sort((a, b) => b.price - a.price);
+  asksEl.innerHTML = sortedAsks.map(r =>
+    `<div class="ob-row ask">
+      <span>${formatPrice(r.price)}</span>
+      <span>${formatCompact(r.tokens)}</span>
+      <span>$${formatCompact(r.usd)}</span>
+      <div class="ob-depth-bar" style="width:${(r.depth*100).toFixed(1)}%"></div>
+    </div>`
+  ).join('');
+
+  // Mid price
+  if (midEl) {
+    midEl.textContent = formatPrice(price);
+    midEl.style.color = isUp ? '#26a69a' : '#ef5350';
+  }
+
+  // Spread
+  if (sprEl && obAsks.length && obBids.length) {
+    const lowestAsk = Math.min(...obAsks.map(r => r.price));
+    const highestBid = Math.max(...obBids.map(r => r.price));
+    const spreadPct = ((lowestAsk - highestBid) / price * 100).toFixed(2);
+    sprEl.textContent = `Spread ${spreadPct}%`;
+  }
+
+  // Bids: highest bid first (closest to mid at top)
+  const sortedBids = [...obBids].sort((a, b) => b.price - a.price);
+  bidsEl.innerHTML = sortedBids.map(r =>
+    `<div class="ob-row bid">
+      <span>${formatPrice(r.price)}</span>
+      <span>${formatCompact(r.tokens)}</span>
+      <span>$${formatCompact(r.usd)}</span>
+      <div class="ob-depth-bar" style="width:${(r.depth*100).toFixed(1)}%"></div>
+    </div>`
+  ).join('');
+}
+
+function formatCompact(n) {
+  if (!n) return '0';
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toFixed(0);
+}
+
+// ── Trading ──────────────────────────────────────────────────────────────────
+function selectBuyAmt(btn) {
+  document.querySelectorAll('#buy-amounts .amt-btn').forEach(b => b.classList.remove('selected-buy'));
+  btn.classList.add('selected-buy');
+  selectedBuyAmt = btn.dataset.amt;
+}
+
+function selectSellPct(btn) {
+  document.querySelectorAll('#sell-amounts .amt-btn').forEach(b => b.classList.remove('selected-sell'));
+  btn.classList.add('selected-sell');
+  selectedSellPct = parseFloat(btn.dataset.pct);
+}
+
+function executeBuy() {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  const me = gameState?.players?.find(p => p.id === playerId);
+  if (!me) return;
+
+  let amount = selectedBuyAmt === 'all' ? me.balance : parseFloat(selectedBuyAmt);
+  amount = Math.min(amount, me.balance);
+  if (amount <= 0) { showToast('❌ Insufficient balance!', 'event'); return; }
+
+  SFX.buy();
+  ws.send(JSON.stringify({ type: 'buy', amount }));
+
+  // Optimistic update for avg buy price tracking
+  totalBought += amount;
+  totalBoughtTokens += amount / gameState.price;
+  avgBuyPrice = totalBought / totalBoughtTokens;
+}
+
+function executeSell() {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  const me = gameState?.players?.find(p => p.id === playerId);
+  if (!me || me.holdings <= 0) { showToast('❌ No tokens to sell!', 'event'); return; }
+
+  SFX.sell();
+  ws.send(JSON.stringify({ type: 'sell', pct: selectedSellPct }));
+}
+
+// ── Price updates ─────────────────────────────────────────────────────────────
+let _priceSfxThrottle = 0;
+function updatePrice(price, marketCap, currentCandle) {
+  if (!gameState) return;
+  const oldPrice = gameState.price;
+  gameState.price = price;
+  gameState.marketCap = marketCap;
+  gameState.currentCandle = currentCandle;
+  lastPrice = oldPrice;
+
+  // Play pump/crash sound at most once every 8s so it doesn't spam
+  const now = Date.now();
+  if (oldPrice && now - _priceSfxThrottle > 8000) {
+    const pct = (price - oldPrice) / oldPrice;
+    if (pct > 0.04) { SFX.pump(); _priceSfxThrottle = now; }
+    else if (pct < -0.04) { SFX.crash(); _priceSfxThrottle = now; }
+  }
+
+  updateGameUI();
+  renderChart();
+  nudgeOrderBook(price);
+  renderOrderBook();
+}
+
+function handleTrade(msg) {
+  const isMe = false; // others' trades
+  const text = msg.tradeType === 'buy'
+    ? `${CHARS[msg.character] || '👤'} <span class="buy-tag">BUY</span> ${msg.playerName} +$${msg.amount.toFixed(2)}`
+    : `${CHARS[msg.character] || '👤'} <span class="sell-tag">SELL</span> ${msg.playerName} -$${msg.amount.toFixed(2)}`;
+  addFeedItem(text);
+  updatePrice(msg.price, msg.marketCap, msg.currentCandle);
+
+  // Update player list if state included
+  if (gameState && gameState.players) {
+    const p = gameState.players.find(p => p.name === msg.playerName);
+    // Net worth will be recalculated on next full state
+  }
+}
+
+function handleTradeConfirmed(msg) {
+  if (!gameState) return;
+  const me = gameState.players?.find(p => p.id === playerId);
+  if (me) {
+    me.balance = msg.balance;
+    me.holdings = msg.holdings;
+    me.netWorth = me.balance + me.holdings * msg.price;
+  }
+  gameState.price = msg.price;
+  gameState.marketCap = msg.marketCap;
+  gameState.currentCandle = msg.currentCandle;
+  updateGameUI();
+  renderChart();
+
+  const type = msg.tradeType;
+  showToast(type === 'buy' ?
+    `✅ Bought tokens at ${formatPrice(msg.price)}` :
+    `✅ Sold tokens at ${formatPrice(msg.price)}`,
+    type);
+}
+
+function handleBotAction(msg) {
+  updatePrice(msg.price, msg.marketCap, msg.currentCandle);
+
+  const text = msg.action === 'buy'
+    ? `${msg.botEmoji} <span class="buy-tag">BOT BUY</span> ${msg.botName} $${msg.amount.toFixed(2)}`
+    : `${msg.botEmoji} <span class="sell-tag">BOT SELL</span> ${msg.botName} $${msg.amount.toFixed(2)}`;
+  addFeedItem(text);
+}
+
+// ── News ─────────────────────────────────────────────────────────────────────
+function addNewsItem(news, price, marketCap, currentCandle) {
+  if (price !== undefined) updatePrice(price, marketCap, currentCandle);
+
+  const feed = document.getElementById('news-feed');
+  const div = document.createElement('div');
+  div.className = `news-item ${news.type}`;
+  const time = new Date(news.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  div.innerHTML = `<div class="news-text">${news.text}</div>
+    <div class="news-time">${time} • ${news.type === 'bullish' ? '▲ BULLISH' : news.type === 'bearish' ? '▼ BEARISH' : '◆ NEUTRAL'}</div>`;
+  feed.prepend(div);
+
+  SFX.news();
+  showToast(news.text, news.type === 'bullish' ? 'buy' : news.type === 'bearish' ? 'sell' : 'event');
+}
+
+function addFeedItem(html) {
+  const feed = document.getElementById('news-feed');
+  const div = document.createElement('div');
+  div.className = 'live-feed-item';
+  div.innerHTML = html;
+  feed.prepend(div);
+  // Keep feed from getting too long
+  while (feed.children.length > 50) feed.removeChild(feed.lastChild);
+}
+
+// ── Random Events ─────────────────────────────────────────────────────────────
+function handleRandomEvent(msg) {
+  const { event, price, marketCap, currentCandle, rugpulled } = msg;
+  if (gameState) {
+    gameState.price = price;
+    gameState.marketCap = marketCap;
+    gameState.currentCandle = currentCandle;
+    gameState.rugpulled = rugpulled;
+  }
+
+  if (event.type === 'catastrophe' || rugpulled) SFX.rugpull();
+  else if (event.type === 'pump') SFX.pump();
+  else if (event.type === 'dump') SFX.crash();
+  else SFX.news();
+
+  updateGameUI();
+  renderChart();
+
+  // Add to news
+  const feed = document.getElementById('news-feed');
+  const div = document.createElement('div');
+  div.className = `news-item event-${event.type}`;
+  div.innerHTML = `<div class="news-text" style="font-weight:600;">${event.text}</div>
+    <div class="news-time">${new Date().toLocaleTimeString()}</div>`;
+  feed.prepend(div);
+
+  // Show dramatic overlay
+  showEventOverlay(event);
+}
+
+function showEventOverlay(event) {
+  const overlay = document.createElement('div');
+  overlay.className = 'event-overlay';
+
+  const icons = {
+    rugpull: '💀', cex_listing: '🏦', elon_tweet: '🐦',
+    sec_news: '⚖️', hack: '🔓', massive_whale: '🐋', viral_meme: '🦠'
+  };
+
+  overlay.innerHTML = `<div class="event-popup ${event.type}">
+    <div class="event-icon">${icons[event.id] || '⚡'}</div>
+    <h2>${event.type === 'euphoria' ? '🚀 MASSIVE PUMP!' : '💀 DISASTER!'}</h2>
+    <div class="event-text">${event.text}</div>
+  </div>`;
+
+  document.body.appendChild(overlay);
+
+  if (event.type === 'catastrophe') {
+    document.body.insertAdjacentHTML('beforeend', '<div class="rugpull-overlay" id="rug-overlay"></div>');
+    setTimeout(() => document.getElementById('rug-overlay')?.remove(), 600);
+  }
+
+  setTimeout(() => overlay.remove(), 4000);
+  overlay.onclick = () => overlay.remove();
+}
+
+// ── Leaderboard ───────────────────────────────────────────────────────────────
+function showLeaderboard(msg) {
+  clearTimers();
+  showScreen('leaderboard');
+
+  const { leaderboard, rugpulled } = msg;
+
+  document.getElementById('lb-title').textContent = rugpulled ? '💀 RUGPULLED — GG' : '🏆 Final Results';
+  document.getElementById('lb-subtitle').textContent = rugpulled
+    ? 'The dev pulled the liquidity. Everyone loses. This is crypto.'
+    : `Final price: ${formatPrice(msg.finalPrice)} | MC: ${formatMC(msg.finalMarketCap)}`;
+
+  // Podium
+  const podium = document.getElementById('lb-podium');
+  podium.innerHTML = '';
+  const order = [1, 0, 2]; // 2nd, 1st, 3rd visual order
+  const heights = [70, 100, 50];
+  const medals = ['🥈', '🥇', '🥉'];
+  const standClasses = ['stand-2', 'stand-1', 'stand-3'];
+
+  order.forEach((rankIdx, i) => {
+    const p = leaderboard[rankIdx];
+    if (!p) return;
+    const div = document.createElement('div');
+    div.className = 'podium-place';
+    div.innerHTML = `
+      <div class="podium-avatar">${CHARS[p.character] || '🎭'}</div>
+      <div class="podium-name">${p.name}</div>
+      <div class="podium-amount ${p.pnl >= 0 ? 'pos' : 'neg'}">${p.pnl >= 0 ? '+' : ''}$${p.pnl.toFixed(2)}</div>
+      <div class="podium-stand ${standClasses[i]}" style="height:${heights[i]}px;">${medals[i]}</div>`;
+    podium.appendChild(div);
+  });
+
+  // Table
+  const tbody = document.getElementById('lb-tbody');
+  tbody.innerHTML = '';
+  leaderboard.forEach((p, i) => {
+    const tr = document.createElement('tr');
+    tr.className = p.id === playerId ? 'self-row' : '';
+    const medalMap = { 0: '🥇', 1: '🥈', 2: '🥉' };
+    const rankCell = medalMap[i] || `#${i + 1}`;
+    const returnPct = p.pnl.toFixed(2);
+    tr.innerHTML = `<td class="rank-cell ${i < 3 ? 'medal-' + (i+1) : ''}">${rankCell}</td>
+      <td>${CHARS[p.character] || '🎭'} ${p.name}${p.id === playerId ? ' (You)' : ''}</td>
+      <td style="font-family:var(--mono);">$${p.netWorth.toFixed(2)}</td>
+      <td class="pnl-cell ${p.pnl >= 0 ? 'pos' : 'neg'}">${p.pnl >= 0 ? '+' : ''}$${Math.abs(p.pnl).toFixed(2)}</td>
+      <td class="pnl-cell ${p.pnl >= 0 ? 'pos' : 'neg'}">${returnPct >= 0 ? '+' : ''}${returnPct}%</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function playAgain() {
+  if (ws) { ws.close(); ws = null; }
+  clearTimers();
+  showScreen('landing');
+}
+
+// ── Toasts ────────────────────────────────────────────────────────────────────
+function showToast(text, type = 'event') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = text;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3200);
+  // Max 4 toasts
+  while (container.children.length > 4) container.removeChild(container.firstChild);
+}
+
+// ── Formatters ────────────────────────────────────────────────────────────────
+function formatPrice(p) {
+  if (!p) return '$0.00';
+  if (p >= 1) return '$' + p.toFixed(4);
+  if (p >= 0.001) return '$' + p.toFixed(6);
+  if (p >= 0.000001) return '$' + p.toFixed(8);
+  return '$' + p.toExponential(4);
+}
+
+function formatMC(mc) {
+  if (mc >= 1e9) return '$' + (mc / 1e9).toFixed(2) + 'B';
+  if (mc >= 1e6) return '$' + (mc / 1e6).toFixed(2) + 'M';
+  if (mc >= 1000) return '$' + (mc / 1000).toFixed(1) + 'K';
+  return '$' + mc.toFixed(0);
+}
+
+function formatTokens(t) {
+  if (t >= 1e9) return (t / 1e9).toFixed(2) + 'B';
+  if (t >= 1e6) return (t / 1e6).toFixed(2) + 'M';
+  if (t >= 1000) return (t / 1000).toFixed(1) + 'K';
+  return t.toFixed(2);
+}
+
+// ── Sound Effects Engine (Web Audio API — no files needed) ────────────────────
+const SFX = (() => {
+  let ctx = null;
+  let enabled = true;
+
+  function getCtx() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+
+  function tone(freq, type, gainVal, duration, fadeOut = true) {
+    if (!enabled) return;
+    try {
+      const c = getCtx();
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.connect(gain);
+      gain.connect(c.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, c.currentTime);
+      gain.gain.setValueAtTime(gainVal, c.currentTime);
+      if (fadeOut) gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + duration);
+      osc.start(c.currentTime);
+      osc.stop(c.currentTime + duration);
+    } catch(e) {}
+  }
+
+  function sweep(freqs, type, gainVal, noteDur) {
+    if (!enabled) return;
+    try {
+      const c = getCtx();
+      freqs.forEach((freq, i) => {
+        const osc = c.createOscillator();
+        const gain = c.createGain();
+        osc.connect(gain);
+        gain.connect(c.destination);
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, c.currentTime + i * noteDur);
+        gain.gain.setValueAtTime(gainVal, c.currentTime + i * noteDur);
+        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + i * noteDur + noteDur * 1.2);
+        osc.start(c.currentTime + i * noteDur);
+        osc.stop(c.currentTime + i * noteDur + noteDur * 1.5);
+      });
+    } catch(e) {}
+  }
+
+  return {
+    buy()   { sweep([440, 554, 659], 'sine', 0.18, 0.09); },
+    sell()  { sweep([659, 494, 370], 'sine', 0.15, 0.09); },
+    pump()  { sweep([330, 415, 523, 659, 784], 'sine', 0.12, 0.07); },
+    crash() { sweep([784, 659, 523, 370, 247], 'sawtooth', 0.08, 0.08); },
+    news()  { tone(880, 'sine', 0.1, 0.12); setTimeout(() => tone(1100, 'sine', 0.08, 0.15), 100); },
+    rugpull() {
+      if (!enabled) return;
+      try {
+        const c = getCtx();
+        // Descending siren wail
+        for (let i = 0; i < 4; i++) {
+          const osc = c.createOscillator();
+          const gain = c.createGain();
+          osc.connect(gain); gain.connect(c.destination);
+          osc.type = 'sawtooth';
+          const t = c.currentTime + i * 0.55;
+          osc.frequency.setValueAtTime(900, t);
+          osc.frequency.exponentialRampToValueAtTime(220, t + 0.5);
+          gain.gain.setValueAtTime(0.22, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+          osc.start(t); osc.stop(t + 0.6);
+        }
+      } catch(e) {}
+    },
+    toggle() {
+      enabled = !enabled;
+      const btn = document.getElementById('sfx-btn');
+      if (btn) { btn.textContent = enabled ? '🔊' : '🔇'; btn.classList.toggle('muted', !enabled); }
+      return enabled;
+    },
+    isOn() { return enabled; }
+  };
+})();
+
+function toggleSFX() { SFX.toggle(); }
+
+// ── Landing Particles ──────────────────────────────────────────────────────────
+(function initParticles() {
+  const canvas = document.getElementById('landing-particles');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles;
+
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  function makeParticle() {
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.4 + 0.3,
+      vx: (Math.random() - 0.5) * 0.18,
+      vy: -Math.random() * 0.22 - 0.04,
+      a: Math.random() * 0.45 + 0.1,
+      color: Math.random() > 0.5 ? '153,69,255' : '20,241,149',
+    };
+  }
+
+  function init() {
+    resize();
+    particles = Array.from({ length: 80 }, makeParticle);
+  }
+
+  function tick() {
+    if (!document.getElementById('screen-landing').classList.contains('active')) {
+      requestAnimationFrame(tick);
+      return;
+    }
+    ctx.clearRect(0, 0, W, H);
+    for (const p of particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.y < -4 || p.x < -4 || p.x > W + 4) {
+        p.x = Math.random() * W;
+        p.y = H + 4;
+      }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${p.a})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+
+  window.addEventListener('resize', () => { resize(); });
+  init();
+  tick();
+})();
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  initChart();
+});
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('screen-game').classList.contains('active')) {
+    resizeChart();
+  }
+});
+</script>
+</body>
+</html>

@@ -539,6 +539,111 @@
     gap: 0;
   }
 
+  /* ── Mobile Tab Bar ── */
+  .mob-tabs {
+    display: none;
+  }
+
+  /* ── Mobile Responsive ── */
+  @media (max-width: 768px) {
+    /* Compact topbar */
+    .topbar {
+      padding: 0.4rem 0.6rem;
+      height: auto;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .topbar-logo { display: none; }
+    .token-info { gap: 0.3rem; }
+    .token-info .mcap-display { display: none; }
+    .timer-display { font-size: 0.9rem; }
+    .player-stat { flex-direction: row; gap: 0.5rem; }
+    .sfx-toggle { padding: 0.18rem 0.4rem; }
+
+    /* Game screen stacks vertically */
+    #screen-game {
+      flex-direction: column;
+    }
+
+    /* Grid becomes a flex stack; panels shown/hidden by JS tab */
+    .game-layout {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* All panels hidden by default on mobile */
+    .sidebar-left,
+    .chart-area,
+    .sidebar-right,
+    .trade-panel {
+      display: none !important;
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* Active tab panel becomes visible */
+    .sidebar-left.mob-active,
+    .chart-area.mob-active,
+    .sidebar-right.mob-active { display: flex !important; }
+    .trade-panel.mob-active   { display: flex !important; flex-direction: row; height: auto; max-height: 100%; overflow-y: auto; }
+
+    /* Chart fills full height on mobile */
+    .chart-area.mob-active {
+      flex-direction: column;
+    }
+
+    /* Trade panel scrollable on mobile */
+    .trade-panel {
+      flex-wrap: wrap;
+    }
+    .trade-section {
+      min-width: 0;
+      flex: 1 1 48%;
+    }
+
+    /* Mobile tab bar — fixed at bottom */
+    .mob-tabs {
+      display: flex;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .mob-tab {
+      flex: 1;
+      padding: 0.65rem 0.25rem 0.5rem;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-family: var(--font);
+      font-size: 0.7rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      transition: color 0.15s;
+      border-top: 2px solid transparent;
+    }
+    .mob-tab .mob-tab-icon { font-size: 1.2rem; line-height: 1; }
+    .mob-tab.active {
+      color: var(--accent2);
+      border-top-color: var(--accent2);
+    }
+
+    /* Landing page cards stack on mobile */
+    .landing-cards {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    .mode-card { width: 85vw; max-width: 320px; }
+    .logo-main { font-size: 3.8rem; }
+  }
+
   /* Left sidebar - players */
   .sidebar-left {
     grid-row: 1 / 3;
@@ -1337,6 +1442,22 @@
       </div>
     </div>
   </div>
+
+  <!-- Mobile tab bar — outside game-layout so it doesn't affect the desktop grid -->
+  <div class="mob-tabs">
+    <button class="mob-tab active" id="mobtab-chart" onclick="switchMobTab('chart')">
+      <span class="mob-tab-icon">📈</span>Chart
+    </button>
+    <button class="mob-tab" id="mobtab-trade" onclick="switchMobTab('trade')">
+      <span class="mob-tab-icon">💰</span>Trade
+    </button>
+    <button class="mob-tab" id="mobtab-book" onclick="switchMobTab('book')">
+      <span class="mob-tab-icon">📊</span>Book
+    </button>
+    <button class="mob-tab" id="mobtab-players" onclick="switchMobTab('players')">
+      <span class="mob-tab-icon">👥</span>Players
+    </button>
+  </div>
 </div>
 
 <!-- ══ SCREEN: LEADERBOARD ══════════════════════════════════════════════════ -->
@@ -1640,6 +1761,7 @@ function initGame(state) {
   if (!me) return;
 
   showScreen('game');
+  initMobTabs();
   resizeChart();
   updateGameUI();
   startGameTimer(state.endTime);
@@ -2416,6 +2538,35 @@ const SFX = (() => {
 })();
 
 function toggleSFX() { SFX.toggle(); }
+
+// ── Mobile Tab Switcher ────────────────────────────────────────────────────────
+function switchMobTab(tab) {
+  const map = {
+    chart:   '.chart-area',
+    trade:   '.trade-panel',
+    book:    '.sidebar-right',
+    players: '.sidebar-left',
+  };
+  // Hide all panels, deactivate all tabs
+  Object.values(map).forEach(sel => {
+    document.querySelector(sel)?.classList.remove('mob-active');
+  });
+  document.querySelectorAll('.mob-tab').forEach(b => b.classList.remove('active'));
+
+  // Show selected panel & activate tab button
+  document.querySelector(map[tab])?.classList.add('mob-active');
+  document.getElementById('mobtab-' + tab)?.classList.add('active');
+
+  // Resize chart canvas when switching to chart tab
+  if (tab === 'chart') { setTimeout(resizeChart, 50); }
+}
+
+// On mobile, initialise chart tab as active when game starts
+function initMobTabs() {
+  if (window.innerWidth <= 768) {
+    switchMobTab('chart');
+  }
+}
 
 // ── Landing Particles ──────────────────────────────────────────────────────────
 (function initParticles() {
